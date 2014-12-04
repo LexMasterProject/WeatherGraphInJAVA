@@ -5,7 +5,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 import javax.swing.BoxLayout;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,11 +29,21 @@ public class WeatherGUI extends JFrame {
 		Container c=this.getContentPane();
 		JPanel panel=new JPanel();
 		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		
+		JComboBox<Integer>testComboBox=new JComboBox<Integer>();
+		Integer[]months=new Integer[30];
+		for (int i = 0; i < months.length; i++) {
+			months[i]=i+1;
+		}
+		DefaultComboBoxModel<Integer>comboxModel=new DefaultComboBoxModel<Integer>(months);
+		testComboBox.setModel(comboxModel);
+		
 		panel.add(new JLabel("Airport:"));
 		panel.add(new JLabel("Year:"));
 		panel.add(new JLabel("Month:"));
 		panel.add(new JLabel("Day:"));
 		panel.add(new JButton("Submit"));
+		panel.add(testComboBox);
 		c.add(panel);
 		
 		

@@ -1,5 +1,7 @@
 import java.awt.Container;
 import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.Panel;
 import java.awt.Toolkit;
 import java.util.Calendar;
 import java.util.Date;
@@ -27,28 +29,36 @@ public class WeatherGUI extends JFrame {
 		System.out.println("width:"+dim.width);
 		
 		Container c=this.getContentPane();
-		JPanel panel=new JPanel();
-		panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+		JPanel p=new JPanel(new GridLayout(3, 1));
 		
-		JComboBox<Integer>testComboBox=new JComboBox<Integer>();
-		Integer[]months=new Integer[30];
-		for (int i = 0; i < months.length; i++) {
-			months[i]=i+1;
-		}
-		DefaultComboBoxModel<Integer>comboxModel=new DefaultComboBoxModel<Integer>(months);
-		testComboBox.setModel(comboxModel);
+		//airport panel
+		JPanel p1= new JPanel(new GridLayout(1, 2));
+		p1.add(new JLabel("Airport:"));
+		//add combo
+		p.add(p1);
+		//date panel 
+	    p1= new JPanel(new GridLayout(1, 6));
+	    p1.add(new JLabel("Year:"));
+	    //add combo
+		p1.add(new JLabel("Month:"));
+		//add combo
+		p1.add(new JLabel("Day:"));
+		//add combo	
+		p.add(p1);
 		
-		panel.add(new JLabel("Airport:"));
-		panel.add(new JLabel("Year:"));
-		panel.add(new JLabel("Month:"));
-		panel.add(new JLabel("Day:"));
-		panel.add(new JButton("Submit"));
-		panel.add(testComboBox);
-		c.add(panel);
-		
-		
-		
-		
+		p1=new JPanel(new GridLayout(1,1));
+		p1.add(new JButton("Submit"));
+		p.add(p1);
+	
+		c.add(p);
+	}
+	
+	private void addComboBox(String[]list,JPanel p)
+	{
+		JComboBox<String>tempComboBox=new JComboBox<String>();
+		DefaultComboBoxModel<String>comboxModel=new DefaultComboBoxModel<String>(list);
+		tempComboBox.setModel(comboxModel);
+		p.add(tempComboBox);
 	}
 	public static void main(String[] args) {
 		

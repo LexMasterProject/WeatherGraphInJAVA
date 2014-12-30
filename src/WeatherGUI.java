@@ -28,7 +28,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 	private final String WINDOW_TITLE="weather";
 	private JButton submitBtn;
 	private JComboBox<String> yearComboBox,monthComboBox,dayComboBox;
-	private DateModelController date;
+	private DateModel date;
 	public WeatherGUI()
 	{
 		setTitle(WINDOW_TITLE);
@@ -36,7 +36,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		Dimension dim = tk.getScreenSize();
 		setSize(dim.width/4, dim.height/4);
 		setLocation(dim.width/4, dim.height/4);
-		date=new DateModelController();
+		date=new DateModel();
 		
 		Container c=this.getContentPane();
 		JPanel p=new JPanel();

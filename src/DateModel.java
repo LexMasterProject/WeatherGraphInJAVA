@@ -2,7 +2,7 @@ import java.util.Calendar;
 import java.util.Date;
 
 
-public class DateModelController {
+public class DateModel {
 
 	private int year,month,day;
 	private int maxYear,minYear;
@@ -26,13 +26,13 @@ public class DateModelController {
 	private int maxMonth,minMonth;
 	
 	
-	public DateModelController(){
+	public DateModel(){
 		setDefaultDate();
 		resetRange();
 	
 	}
 	
-	public DateModelController(int year,int month,int day){
+	public DateModel(int year,int month,int day){
 		setDate(year,month,day);
 		resetRange();
 	}
@@ -163,7 +163,7 @@ public class DateModelController {
 	public static void main(String[] args) {
 		
 		//testing getDefaultDate
-		DateModelController myDate=new DateModelController();
+		DateModel myDate=new DateModel();
 		System.out.println(myDate.getYear()+"-"+myDate.getMonth()+"-"+myDate.getDay());
 		
 		

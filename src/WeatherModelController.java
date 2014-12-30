@@ -9,11 +9,13 @@ public class WeatherModelController {
     public static final String searchTemplate="http://www.wunderground.com/history/"
 	+ "airport/AAAA/YYYY/MM/DD/DailyHistory.html?HideSpecis=1&format=1";
     private String searchStr;
-    private DateModel mydate;
+    private DateModel dateModel;
     private int airportIndex;
     private WeatherNetSpider spider;
     private ArrayList<String>time;
-    private float temperature[];
+  
+
+	private float temperature[];
     private float atPressure[];
     private float windSpeed[];
     private float gustSpeed[];
@@ -21,7 +23,7 @@ public class WeatherModelController {
 	
     public WeatherModelController()
     {
-    	mydate=new DateModel();
+    	dateModel=new DateModel();
     	try {
     		spider=new WeatherNetSpider("http://www.wunderground.com/history/airport/EGLL/2010/11/30/DailyHistory.html?HideSpecis=1&format=1");
     	} catch (MalformedURLException e) {
@@ -54,7 +56,13 @@ public class WeatherModelController {
     	}
     }
     
-    public float[] getAtPressure() {
+  
+    
+    public DateModel getDateModel() {
+		return dateModel;
+	}
+
+	public float[] getAtPressure() {
 		return atPressure;
 	}
 

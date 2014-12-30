@@ -95,10 +95,16 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		  Object source= e.getSource();
 		  if(source==submitBtn)
 		  {
+			  String location=(String)airportComboBox.getSelectedItem();
+			  weatherMC.setLocation(location);
+			  weatherMC.getInfo();
 			  WeatherGraphGui graphGui=new WeatherGraphGui();
-			  System.out.println(airportComboBox.getSelectedItem());
 			  graphGui.setVisible(true);
 			  graphGui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);  
+			  
+			  weatherMC.getDateModel().debugOutput();
+			  System.out.println(weatherMC.getLocation());
+			  System.out.println(weatherMC.getSearchURL());
 		  }
 		  else if(source==yearComboBox)
 		  {
@@ -106,7 +112,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 			  String year=(String)yearComboBox.getSelectedItem();
 			  date.setYear(Integer.parseInt(year));
 			  dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
-			  date.debugOutput();
+		
 		  }
 		  else if(source==monthComboBox)
 		  {
@@ -114,7 +120,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 			  String month=(String)monthComboBox.getSelectedItem();
 			  date.setMonth(Integer.parseInt(month));
 			  dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
-			  date.debugOutput();
+		
 		
 		  }
 		  else if(source==dayComboBox)
@@ -123,8 +129,9 @@ public class WeatherGUI extends JFrame implements ActionListener {
 			  String day=(String)dayComboBox.getSelectedItem();
 			  date.setDay(Integer.parseInt(day));
 			  dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
-			  date.debugOutput();
+			 
 		  }
+		
 		
 	}
 	public static void main(String[] args) {

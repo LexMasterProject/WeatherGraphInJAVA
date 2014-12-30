@@ -5,60 +5,83 @@ import java.util.ArrayList;
 
 public class WeatherModelController {
 
-    public static final String[]airports={"EGLL"};
-    public static final String searchTemplate="http://www.wunderground.com/history/"
-	+ "airport/AAAA/YYYY/MM/DD/DailyHistory.html?HideSpecis=1&format=1";
-    private String searchStr;
-    private DateModel dateModel;
-    private int airportIndex;
-    private WeatherNetSpider spider;
-    private ArrayList<String>time;
-  
+
+	
+	private String searchURL;
+	private DateModel dateModel;
+	private String location;
+	
+
+
+	private WeatherNetSpider spider;
+	private ArrayList<String>time;
+
 
 	private float temperature[];
-    private float atPressure[];
-    private float windSpeed[];
-    private float gustSpeed[];
-    private float precipitationMm[];
-	
-    public WeatherModelController()
-    {
-    	dateModel=new DateModel();
-    	try {
-    		spider=new WeatherNetSpider("http://www.wunderground.com/history/airport/EGLL/2010/11/30/DailyHistory.html?HideSpecis=1&format=1");
-    	} catch (MalformedURLException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
-    	}
-    }
+	private float atPressure[];
+	private float windSpeed[];
+	private float gustSpeed[];
+	private float precipitationMm[];
 
-    //get info through spider
-    public void getInfo()
-    {
-    	try {
-    		if(spider.connect()!=0)
-    		{
-    			spider.getInfo();		
-    			time=spider.getTime();
-    			temperature=arrayListStrToFloatArr(spider.getTemperature());
-    			atPressure=arrayListStrToFloatArr(spider.getAtPressure());
-    			windSpeed=arrayListStrToFloatArr(spider.getWindSpeed());
-    			gustSpeed=arrayListStrToFloatArr(spider.getGustSpeed());
-    			precipitationMm=arrayListStrToFloatArr(spider.getPrecipitationMm());
-    		}
-    		else
-    		{
-    			System.out.println("Can not access net");
-    		}
-    	} catch (IOException e) {
-    		// TODO Auto-generated catch block
-    		e.printStackTrace();
-    	}
-    }
-    
-  
-    
-    public DateModel getDateModel() {
+	public WeatherModelController()
+	{
+		dateModel=new DateModel();
+		location=null;
+	}
+
+	//generate search url
+	//must invoke setLocation in advance
+	private void generateURL()
+	{
+		 String AAAA=AirportSingleton.getInstance().getICAO(location);
+		 String YYYY=Integer.toString(dateModel.getYear());
+		 String MM=Integer.toString(dateModel.getMonth());
+		 String DD=Integer.toString(dateModel.getDay());
+		 searchURL="http://www.wunderground.com/history/airport/"+
+				 	AAAA+"/"+YYYY+"/"+MM+"/"+DD+"/"+
+				 "DailyHistory.html?HideSpecis=1&format=1";
+	}
+	
+	
+	//get info through spider
+	public void getInfo()
+	{
+		try {
+			generateURL();
+			spider=new WeatherNetSpider(searchURL);
+			if(spider.connect()!=0)
+			{
+				spider.getInfo();		
+				time=spider.getTime();
+				temperature=arrayListStrToFloatArr(spider.getTemperature());
+				atPressure=arrayListStrToFloatArr(spider.getAtPressure());
+				windSpeed=arrayListStrToFloatArr(spider.getWindSpeed());
+				gustSpeed=arrayListStrToFloatArr(spider.getGustSpeed());
+				precipitationMm=arrayListStrToFloatArr(spider.getPrecipitationMm());
+			}
+			else
+			{
+				System.out.println("Can not access net");
+			}
+		} 
+		catch (MalformedURLException e) {
+			e.printStackTrace();
+		}catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+	}
+	
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public DateModel getDateModel() {
 		return dateModel;
 	}
 
@@ -93,16 +116,16 @@ public class WeatherModelController {
 		}
 		return arr;
 	}
-    public void setSearchData(String location,DateModel mydate)
-    {
-    	
-    }
-	
+	public void setSearchData(String location,DateModel mydate)
+	{
+
+	}
+
 	public float[] getTemperature() 
 	{
 		return temperature;
 	}
-	
+
 	/*
 	 *  testing code
 	 */
@@ -127,12 +150,13 @@ public class WeatherModelController {
 		}
 		System.out.println();
 	}
-	
-    public static void main(String[] args)
-    {
+
+	public static void main(String[] args)
+	{
 		WeatherModelController wmc=new WeatherModelController();
+		wmc.setLocation("London Heathrow");
 		wmc.getInfo();
-		
+
 		//print time
 		System.out.println("time:");
 		wmc.printStrArrayList(wmc.getTime());
@@ -151,11 +175,15 @@ public class WeatherModelController {
 		//print precipitationMm
 		System.out.println("precipitationMm:");
 		wmc.printFloatArr(wmc.getPrecipitationMm());
-		
-		
-		
-		
-    }
+
+
+
+
+	}
+
+	public String getSearchURL() {
+		return searchURL;
+	}
 
 	public ArrayList<String> getTime() {
 		return time;

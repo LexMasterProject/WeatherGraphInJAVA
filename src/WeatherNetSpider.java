@@ -15,23 +15,36 @@ public class WeatherNetSpider {
 	 */
 
 	//the info kind we are interested
-	public static final String[] INFO_KIND={"TimeGMT","TemperatureC","Sea Level PressurehPa","Wind SpeedKm/h","Gust SpeedKm/h"};
+	public static final String[] INFO_KIND={"TimeGMT","TemperatureC","Sea Level PressurehPa","Wind SpeedKm/h","Gust SpeedKm/h","Precipitationmm"};
+	public static enum InfoKind{TimeGMT,Temperature,AtPressure,WindSp,GustSp,PrecipitationMm};
 	//number of info kind 
 	public static final int NUM_OF_INFO_KIND=INFO_KIND.length;
 	private URL url; 
 	private HttpURLConnection httpCon;
 	private int isConnected;
-	private ArrayList<String>weatherInfo; 
+	
 	private String infoHead;
 	private int[]infoIndex;
+	private ArrayList<String>time; 
+	private ArrayList<String>temperature; 
+	private ArrayList<String>atPressure; 
+	private ArrayList<String>windSpeed;
+	private ArrayList<String>gustSpeed;
+	private ArrayList<String>precipitationMm;
 
 
 	public WeatherNetSpider(String urlStr) throws MalformedURLException
 	{
 		url=new URL(urlStr);	
-		weatherInfo=new ArrayList<String>();
+		
 		isConnected=0;
 		infoIndex=new int[NUM_OF_INFO_KIND];
+		time=new ArrayList<String>();
+		temperature=new ArrayList<String>();
+		atPressure=new ArrayList<String>();
+		windSpeed=new ArrayList<String>();
+		gustSpeed=new ArrayList<String>();
+		precipitationMm=new ArrayList<String>();
 	}
 
 	public void setURL(String urlStr) throws MalformedURLException
@@ -55,9 +68,9 @@ public class WeatherNetSpider {
 		return isConnected;		
 	}
 
-	public ArrayList<String> getInfo() throws IOException
+	public void getInfo() throws IOException
 	{
-		weatherInfo.clear();
+		
 		if(isConnected==1)
 		{
 			BufferedReader in=new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
@@ -67,7 +80,7 @@ public class WeatherNetSpider {
 				if(inputLine.length()!=0)
 				{
 					infoHead=inputLine;
-					System.out.println(infoHead);
+					
 					getInfoIndex();
 					break;
 				}
@@ -77,12 +90,12 @@ public class WeatherNetSpider {
 			while ((inputLine = in.readLine()) != null) 
 			{
 				parseInfo(inputLine);
-				break;
+				
 			}
 			in.close();
 		}
 
-		return weatherInfo;
+		
 	}
 	
 	//get info index through the infoHead
@@ -94,11 +107,9 @@ public class WeatherNetSpider {
 		}
 		else
 		{
-			
-			
+			//calc the interested info index in the infohead we get
 			ArrayList<String>infoHeaderItems=new ArrayList<String>();
 			infoHeaderItems.addAll(Arrays.asList(infoHead.split(",")));
-			
 			for (int i = 0; i < infoIndex.length; i++) {
 				infoIndex[i]=infoHeaderItems.indexOf(INFO_KIND[i]);
 			}
@@ -108,28 +119,87 @@ public class WeatherNetSpider {
 	
 	private void parseInfo(String infoItemStr)
 	{
-		System.out.println("in parseInfo:");
-		ArrayList<String>infoItems=new ArrayList<String>();
-		infoItems.addAll(Arrays.asList(infoItemStr.split(",")));
-		
-		for (int i = 0; i < infoIndex.length; i++) {
-			System.out.println(infoItems.get(infoIndex[i]));
+		String[]infoItems;
+		infoItems=infoItemStr.split(",");
+		if(time.size()==0||!time.get(time.size()-1).equals(infoItems[infoIndex[0]]))
+		{
+		time.add(infoItems[infoIndex[0]]);
+		temperature.add(infoItems[infoIndex[1]]); 
+		atPressure.add(infoItems[infoIndex[2]]); 
+		windSpeed.add(infoItems[infoIndex[3]]);
+		gustSpeed.add(infoItems[infoIndex[4]]);
+		precipitationMm.add(infoItems[infoIndex[5]]);
 		}
+		else
+		{
+			temperature.set(temperature.size()-1, infoItems[infoIndex[1]]);
+			atPressure.set(atPressure.size()-1, infoItems[infoIndex[2]]);
+			windSpeed.set(windSpeed.size()-1, infoItems[infoIndex[3]]);
+			gustSpeed.set(gustSpeed.size()-1, infoItems[infoIndex[4]]);
+			precipitationMm.set(gustSpeed.size()-1, infoItems[infoIndex[5]]);
+		
+		}
+	}
+	
+	public void printTest()
+	{
+		
+		float sum=0;
+		for (String wind : windSpeed) {
+			sum+=Float.parseFloat(wind);
+		}
+		
+		System.out.println("average wind speed:"+sum/windSpeed.size());
+		
+		sum=0;
+		for (String temper : temperature) {
+			sum+=Float.parseFloat(temper);
+		}
+		
+		System.out.println("average tem:"+sum/temperature.size());
+		System.out.println(precipitationMm.get(precipitationMm.size()-1));
+		
+		
 		
 	}
 	
+	public ArrayList<String> getTime() {
+		return time;
+	}
 
+	public ArrayList<String> getTemperature() {
+		return temperature;
+	}
+
+	public ArrayList<String> getAtPressure() {
+		return atPressure;
+	}
+
+	public ArrayList<String> getWindSpeed() {
+		return windSpeed;
+	}
+
+	public ArrayList<String> getGustSpeed() {
+		return gustSpeed;
+	}
+
+	public ArrayList<String> getPrecipitationMm() {
+		return precipitationMm;
+	}
+
+	public void setUrl(URL url) {
+		this.url = url;
+	}
+	
 	public static void main(String[] args) {
 
 		try {
 			WeatherNetSpider spider=new WeatherNetSpider("http://www.wunderground.com/history/airport/EGLL/2010/11/30/DailyHistory.html?HideSpecis=1&format=1");
 			if(spider.connect()!=0)
 			{
-//				for(String str:spider.getInfo())
-//				{
-//					System.out.println(str.length()+" "+str);
-//				}
+
 				spider.getInfo();
+				spider.printTest();
 				
 			}
 			else
@@ -144,9 +214,6 @@ public class WeatherNetSpider {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-
-
 	}
 
 }

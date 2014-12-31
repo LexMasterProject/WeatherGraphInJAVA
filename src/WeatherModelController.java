@@ -1,17 +1,14 @@
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 public class WeatherModelController {
-
-
 	
 	private String searchURL;
 	private DateModel dateModel;
 	private String location;
-	
-
 
 	private WeatherNetSpider spider;
 	private ArrayList<String>time;
@@ -41,7 +38,6 @@ public class WeatherModelController {
 				 	AAAA+"/"+YYYY+"/"+MM+"/"+DD+"/"+
 				 "DailyHistory.html?HideSpecis=1&format=1";
 	}
-	
 	
 	//get info through spider
 	public void getInfo()
@@ -100,6 +96,54 @@ public class WeatherModelController {
 	public float[] getPrecipitationMm() {
 		return precipitationMm;
 	}
+	
+	public int getTempStart(int step)
+	{
+		return downRound(temperature, step);
+	}
+	public int getTempEnd(int step)
+	{
+		return upRound(temperature, step);
+	}
+	private int upRound(float[]arr,int step)
+	{
+		 if(arr.length!=0)
+		 {
+			 float max=arr[0];
+			 for(int i=0;i<arr.length;i++)
+			 {
+				max=Math.max(max,arr[i]); 
+			 }
+			 int imax=(int)max;
+			 while(imax%step!=0)
+			 {
+				 imax++;
+			 }
+			 System.out.println("max:"+imax);
+			 return imax;
+		 }
+		 return 0;
+	}
+	
+	private int downRound(float[]arr,int step)
+	{
+		if(arr.length!=0)
+		 {
+			 float min=arr[0];
+			 for(int i=0;i<arr.length;i++)
+			 {
+				min=Math.min(min,arr[i]); 
+			 }
+			 int imin=(int)min;
+			 while(imin%step!=0)
+			 {
+				 imin--;
+			 }
+			 System.out.println("min:"+imin);
+			 return imin;
+		 }
+		 return 0;
+	}
 
 	//transform from arraylist<String> to float array
 	private float[]arrayListStrToFloatArr(ArrayList<String>arrlist)
@@ -115,10 +159,6 @@ public class WeatherModelController {
 			}
 		}
 		return arr;
-	}
-	public void setSearchData(String location,DateModel mydate)
-	{
-
 	}
 
 	public float[] getTemperature() 

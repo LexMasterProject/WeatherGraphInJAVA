@@ -56,9 +56,6 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		monthComboBox=addDateComboBox(date.getMinMonth(), date.getMaxMonth(),date.getMaxMonth(), p);
 		p.add(new JLabel("Day:"));
 		dayComboBox=addDateComboBox(date.getMinDay(), date.getMaxDay(), date.getDay(),p);
-		
-
-		
 	
 		submitBtn=new JButton("Submit");
 		submitBtn.addActionListener(this);
@@ -67,9 +64,9 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		
 		c.add(p);
 		
-	
-		
 	}
+	
+  
 
 	private JComboBox<String> addDateComboBox(int min,int max,int item,JPanel p)
 	{
@@ -98,7 +95,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 			  String location=(String)airportComboBox.getSelectedItem();
 			  weatherMC.setLocation(location);
 			  weatherMC.getInfo();
-			  WeatherGraphGui graphGui=new WeatherGraphGui();
+			  WeatherGraphGui graphGui=new WeatherGraphGui(weatherMC);
 			  graphGui.setVisible(true);
 			  graphGui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);  
 			  

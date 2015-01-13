@@ -4,6 +4,7 @@ import java.awt.Event;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
 import java.awt.IllegalComponentStateException;
+import java.awt.Label;
 import java.awt.Panel;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -42,36 +43,31 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		Container c=this.getContentPane();
 		
 		//main panel 
-		JPanel p=new JPanel(new GridLayout(3, 1));
-		
-		//p1 is the temp panel for every row widgets
-		JPanel p1=new JPanel();
+		JPanel p=new JPanel(new ParagraphLayout());
 		
 		//airport panel
-		p1=new JPanel();
-		p1.add(new JLabel("Airport:"));
+		p.add(new JLabel("Airport:"),ParagraphLayout.NEW_PARAGRAPH);
 		airportComboBox=new JComboBox<String>(AirportSingleton.getInstance().getLocations());
 		airportComboBox.setSelectedIndex(0);
-		p1.add(airportComboBox);
-		p.add(p1);
+		p.add(airportComboBox);
+	
 		
 		//date panel 
-		p1=new JPanel();
 	    DateModel date=weatherMC.getDateModel();
-	    p1.add(new JLabel("Year:"));
-	    yearComboBox=addDateComboBox(date.getMinYear(), date.getMaxYear(),date.getYear(), p1);
-		p1.add(new JLabel("Month:"));
-		monthComboBox=addDateComboBox(date.getMinMonth(), date.getMaxMonth(),date.getMonth(), p1);
-		p1.add(new JLabel("Day:"));
-		dayComboBox=addDateComboBox(date.getMinDay(), date.getMaxDay(), date.getDay(),p1);
-		p.add(p1);
+	    p.add(new JLabel("Year:"),ParagraphLayout.NEW_PARAGRAPH);
+	    yearComboBox=addDateComboBox(date.getMinYear(), date.getMaxYear(),date.getYear(), p);
+		p.add(new JLabel("Month:"));
+		monthComboBox=addDateComboBox(date.getMinMonth(), date.getMaxMonth(),date.getMonth(), p);
+		p.add(new JLabel("Day:"));
+		dayComboBox=addDateComboBox(date.getMinDay(), date.getMaxDay(), date.getDay(),p);
+	
 		
 		//submit btn
-		p1=new JPanel();
+		p.add(new Label(),ParagraphLayout.NEW_PARAGRAPH);
 		submitBtn=new JButton("Submit");
 		submitBtn.addActionListener(this);
-		p1.add(submitBtn);
-		p.add(p1);
+		p.add(submitBtn);
+		
 
 		c.add(p);
 		

@@ -1,3 +1,4 @@
 #!/bin/bash
+rm *.class
 javac WeatherGUI.java
 java WeatherGUI

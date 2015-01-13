@@ -121,6 +121,8 @@ public class WeatherNetSpider {
 	{
 		String[]infoItems;
 		infoItems=infoItemStr.split(",");
+		//if two data appears at the same time:
+		//discard the first, reserve the second
 		if(time.size()==0||!time.get(time.size()-1).equals(infoItems[infoIndex[0]]))
 		{
 		time.add(infoItems[infoIndex[0]]);

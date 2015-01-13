@@ -29,23 +29,40 @@ public class WeatherGraphGui extends JFrame {
 	public WeatherGraphGui(WeatherModelController wmc)  {
 		this.wmc=wmc;
 		setTitle(WINDOW_TITLE);
-		//setSize(400, 500);
+	
 		setSize(800, 550);
 		
 		Container c=getContentPane();
 		JPanel p=new JPanel(new GridLayout(3, 1));
-		System.out.println("@@@@@@@@@@@@@");
-		System.out.println(wmc.getTempStart(3));
-		System.out.println(wmc.getTempEnd(3));
-		System.out.println(3);
-		tempGraphPanel=new GraphPanel(wmc.getTempStart(3),wmc.getTempEnd(3),3);
-		
+
+		int temperatureStep=3;
+		tempGraphPanel=new GraphPanel(wmc.getTempStart(temperatureStep),wmc.getTempEnd(temperatureStep),temperatureStep,wmc.getTemperature(),wmc.getTime());
 		tempGraphPanel.setDataTransfer(new CelsiusToFahrenheit());
+		tempGraphPanel.setHeader("Temperature");
+		tempGraphPanel.setLeftUnit("C");
+		tempGraphPanel.setRightUnit("F");
+		
+		
 		p.add(tempGraphPanel);
-//		windGraphPanel=new GraphPanel();
-//		p.add(windGraphPanel);
-//		atPressGraphPanel=new GraphPanel();
-//		p.add(atPressGraphPanel);
+		
+		int pressureStep=3;
+		atPressGraphPanel=new GraphPanel(wmc.getatPressureStart(pressureStep),
+				wmc.getatPressureEnd(pressureStep),
+				pressureStep,wmc.getAtPressure(),wmc.getTime());
+		atPressGraphPanel.setHeader("Barometric Pressure");
+		atPressGraphPanel.setLeftUnit("hPa");
+		p.add(atPressGraphPanel);
+		
+		int windStep=8;
+		windGraphPanel=new GraphPanel(wmc.getWindStart(windStep),wmc.getWindEnd(windStep),windStep,wmc.getWindSpeed(),wmc.getTime());
+		windGraphPanel.setDataTransfer(new KmhToMph());
+		windGraphPanel.setHeader("Wind Speed");
+		windGraphPanel.setLeftUnit("km/h");
+		windGraphPanel.setRightUnit("mph");
+		p.add(windGraphPanel);
+		
+		
+
 		
 		c.add(p);
 		

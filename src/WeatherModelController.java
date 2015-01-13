@@ -11,9 +11,9 @@ public class WeatherModelController {
 	private String location;
 
 	private WeatherNetSpider spider;
-	private ArrayList<String>time;
+	
 
-
+	private float time[];
 	private float temperature[];
 	private float atPressure[];
 	private float windSpeed[];
@@ -22,6 +22,7 @@ public class WeatherModelController {
 
 	public WeatherModelController()
 	{
+		
 		dateModel=new DateModel();
 		location=null;
 	}
@@ -48,10 +49,11 @@ public class WeatherModelController {
 			if(spider.connect()!=0)
 			{
 				spider.getInfo();		
-				time=spider.getTime();
+				time=transferTimeList(spider.getTime());
 				temperature=arrayListStrToFloatArr(spider.getTemperature());
 				atPressure=arrayListStrToFloatArr(spider.getAtPressure());
 				windSpeed=arrayListStrToFloatArr(spider.getWindSpeed());
+				System.out.println();
 				gustSpeed=arrayListStrToFloatArr(spider.getGustSpeed());
 				precipitationMm=arrayListStrToFloatArr(spider.getPrecipitationMm());
 			}
@@ -69,6 +71,52 @@ public class WeatherModelController {
 
 	}
 	
+	//transfer timeList to minutes array
+	private float[] transferTimeList(ArrayList<String>timelist)
+	{
+		
+		float[]time=new float[timelist.size()];
+		for (int i = 0; i < timelist.size(); i++) {
+			
+			time[i]=timeToMinutes(timelist.get(i));
+		}
+		
+		return time;
+	}
+	
+	//transfer time to minutes
+	//e.g. 03:10 am=3*60+10
+	//     03:10 pm=(3+12)*60+10
+	private float timeToMinutes(String time)
+	{
+		final int PERIOD=1,TIME=0;
+		final int HOUR=0,MINUTE=1;
+		String timeInfo[]=time.split(" ");
+		String hourAndMin[]=timeInfo[TIME].split(":");
+		float minutes;
+		if(timeInfo[PERIOD].equalsIgnoreCase("am"))
+		{
+			if(hourAndMin[HOUR].equals("12"))
+			{
+				minutes=Float.parseFloat( hourAndMin[MINUTE]);
+			}
+			else
+			{
+				minutes=Float.parseFloat(hourAndMin[HOUR])*60+Float.parseFloat(hourAndMin[MINUTE]);
+			}
+		}
+		else
+		{
+			if (hourAndMin[HOUR].equals("12")) {
+				minutes=Float.parseFloat(hourAndMin[HOUR])*60+Float.parseFloat(hourAndMin[MINUTE]);
+			}
+			else
+			{
+				minutes=(Float.parseFloat(hourAndMin[HOUR])+12)*60+Float.parseFloat(hourAndMin[MINUTE]);
+			}
+		}
+		return minutes;
+	}
 	public void setLocation(String location) {
 		this.location = location;
 	}
@@ -105,21 +153,42 @@ public class WeatherModelController {
 	{
 		return upRound(temperature, step);
 	}
+	public int getWindStart(int step)
+	{
+		return downRound(windSpeed, step);
+	}
+	public int getWindEnd(int step)
+	{
+		return upRound(windSpeed, step);
+	}
+	
+	public int getatPressureStart(int step)
+	{
+		return downRound(atPressure, step);
+	}
+	public int getatPressureEnd(int step)
+	{
+		return upRound(atPressure, step);
+	}
+	
 	private int upRound(float[]arr,int step)
 	{
+		
 		 if(arr.length!=0)
 		 {
 			 float max=arr[0];
+			
 			 for(int i=0;i<arr.length;i++)
 			 {
 				max=Math.max(max,arr[i]); 
 			 }
-			 int imax=(int)max;
+			
+			 int imax=(int)max+1;
 			 while(imax%step!=0)
 			 {
 				 imax++;
 			 }
-			 System.out.println("max:"+imax);
+			
 			 return imax;
 		 }
 		 return 0;
@@ -130,16 +199,18 @@ public class WeatherModelController {
 		if(arr.length!=0)
 		 {
 			 float min=arr[0];
+			
 			 for(int i=0;i<arr.length;i++)
 			 {
 				min=Math.min(min,arr[i]); 
 			 }
-			 int imin=(int)min;
+		
+			 int imin=(int)min-1;
 			 while(imin%step!=0)
 			 {
 				 imin--;
 			 }
-			 System.out.println("min:"+imin);
+	
 			 return imin;
 		 }
 		 return 0;
@@ -191,6 +262,11 @@ public class WeatherModelController {
 		System.out.println();
 	}
 
+	public String getSearchURL() {
+		return searchURL;
+	}
+
+	
 	public static void main(String[] args)
 	{
 		WeatherModelController wmc=new WeatherModelController();
@@ -199,7 +275,7 @@ public class WeatherModelController {
 
 		//print time
 		System.out.println("time:");
-		wmc.printStrArrayList(wmc.getTime());
+		wmc.printFloatArr(wmc.getTime());
 		//print temperature
 		System.out.println("temperature:");
 		wmc.printFloatArr(wmc.getTemperature());
@@ -221,13 +297,15 @@ public class WeatherModelController {
 
 	}
 
-	public String getSearchURL() {
-		return searchURL;
-	}
-
-	public ArrayList<String> getTime() {
+	public float[] getTime() {
 		return time;
 	}
+
+	public void setTime(float[] time) {
+		this.time = time;
+	}
+
+
 
 
 

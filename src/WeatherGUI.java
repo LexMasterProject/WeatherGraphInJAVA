@@ -40,28 +40,39 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		
 		
 		Container c=this.getContentPane();
-		JPanel p=new JPanel();
+		
+		//main panel 
+		JPanel p=new JPanel(new GridLayout(3, 1));
+		
+		//p1 is the temp panel for every row widgets
+		JPanel p1=new JPanel();
 		
 		//airport panel
-		p.add(new JLabel("Airport:"));
+		p1=new JPanel();
+		p1.add(new JLabel("Airport:"));
 		airportComboBox=new JComboBox<String>(AirportSingleton.getInstance().getLocations());
 		airportComboBox.setSelectedIndex(0);
-		p.add(airportComboBox);
+		p1.add(airportComboBox);
+		p.add(p1);
 		
 		//date panel 
+		p1=new JPanel();
 	    DateModel date=weatherMC.getDateModel();
-	    p.add(new JLabel("Year:"));
-	    yearComboBox=addDateComboBox(date.getMinYear(), date.getMaxYear(),date.getYear(), p);
-		p.add(new JLabel("Month:"));
-		monthComboBox=addDateComboBox(date.getMinMonth(), date.getMaxMonth(),date.getMaxMonth(), p);
-		p.add(new JLabel("Day:"));
-		dayComboBox=addDateComboBox(date.getMinDay(), date.getMaxDay(), date.getDay(),p);
-	
+	    p1.add(new JLabel("Year:"));
+	    yearComboBox=addDateComboBox(date.getMinYear(), date.getMaxYear(),date.getYear(), p1);
+		p1.add(new JLabel("Month:"));
+		monthComboBox=addDateComboBox(date.getMinMonth(), date.getMaxMonth(),date.getMonth(), p1);
+		p1.add(new JLabel("Day:"));
+		dayComboBox=addDateComboBox(date.getMinDay(), date.getMaxDay(), date.getDay(),p1);
+		p.add(p1);
+		
+		//submit btn
+		p1=new JPanel();
 		submitBtn=new JButton("Submit");
 		submitBtn.addActionListener(this);
-		p.add(submitBtn);
-	
-		
+		p1.add(submitBtn);
+		p.add(p1);
+
 		c.add(p);
 		
 	}
@@ -99,9 +110,11 @@ public class WeatherGUI extends JFrame implements ActionListener {
 			  graphGui.setVisible(true);
 			  graphGui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);  
 			  
-			  weatherMC.getDateModel().debugOutput();
-			  System.out.println(weatherMC.getLocation());
+			  
+			  // ouput search url
 			  System.out.println(weatherMC.getSearchURL());
+			  
+			 
 		  }
 		  else if(source==yearComboBox)
 		  {
@@ -115,6 +128,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		  {
 			  DateModel date=weatherMC.getDateModel();
 			  String month=(String)monthComboBox.getSelectedItem();
+			  System.out.println(month);
 			  date.setMonth(Integer.parseInt(month));
 			  dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
 		

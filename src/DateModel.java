@@ -1,5 +1,5 @@
 import java.util.Calendar;
-import java.util.Date;
+
 
 
 public class DateModel {
@@ -8,7 +8,7 @@ public class DateModel {
 	private int maxYear,minYear;
 	private int maxDay,minDay;
 	public int getMaxDay() {
-		return maxDay;
+		return 31;
 	}
 
 	public int getMinDay() {

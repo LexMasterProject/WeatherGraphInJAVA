@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -53,7 +54,6 @@ public class WeatherModelController {
 				temperature=arrayListStrToFloatArr(spider.getTemperature());
 				atPressure=arrayListStrToFloatArr(spider.getAtPressure());
 				windSpeed=arrayListStrToFloatArr(spider.getWindSpeed());
-				System.out.println();
 				gustSpeed=arrayListStrToFloatArr(spider.getGustSpeed());
 				precipitationMm=arrayListStrToFloatArr(spider.getPrecipitationMm());
 			}
@@ -117,6 +117,45 @@ public class WeatherModelController {
 		}
 		return minutes;
 	}
+	
+	
+	public String getAverageTemperature()
+	{   
+		DecimalFormat df=new DecimalFormat("#0.00");
+		String ret=df.format(getAverage(temperature)).toString();
+		return ret;
+	}
+	public String getAveragePressure()
+	{
+		DecimalFormat df=new DecimalFormat("#0");
+		String ret=df.format(getAverage(atPressure)).toString();
+		return ret;
+	}
+	public String getAverageWindSp()
+	{
+		DecimalFormat df=new DecimalFormat("#0.0");
+		String ret=df.format(getAverage(windSpeed)).toString();
+		return ret;
+	}
+	public String getAverageGustSp()
+	{
+		DecimalFormat df=new DecimalFormat("#0.0");
+		String ret=df.format(getAverage(gustSpeed)).toString();
+		return ret;
+	}
+	
+	private float getSum(float[]arr)
+	{
+		float sum=0;
+		for (int i = 0; i < arr.length; i++) {
+			sum+=arr[i];
+		}
+		return sum;
+	}
+	private float getAverage(float[]arr)
+	{
+		return getSum(arr)/arr.length;
+	}
 	public void setLocation(String location) {
 		this.location = location;
 	}
@@ -159,7 +198,9 @@ public class WeatherModelController {
 	}
 	public int getWindEnd(int step)
 	{
-		return upRound(windSpeed, step);
+		int normalWindSpEnd=upRound(windSpeed, step);
+		int gustWindSpEnd=upRound(gustSpeed, step);
+		return Math.max(normalWindSpEnd, gustWindSpEnd);
 	}
 	
 	public int getatPressureStart(int step)
@@ -217,6 +258,7 @@ public class WeatherModelController {
 	}
 
 	//transform from arraylist<String> to float array
+	//if counter abnormal forms: change data to 0
 	private float[]arrayListStrToFloatArr(ArrayList<String>arrlist)
 	{
 		float[] arr=new float[arrlist.size()];
@@ -231,14 +273,31 @@ public class WeatherModelController {
 		}
 		return arr;
 	}
+	
 
+
+	
+
+	public String getSearchURL() {
+		return searchURL;
+	}
+
+	public float[] getTime() {
+		return time;
+	}
+
+	public void setTime(float[] time) {
+		this.time = time;
+	}
+	
 	public float[] getTemperature() 
 	{
 		return temperature;
 	}
 
+	
 	/*
-	 *  testing code
+	 *  output code for testing
 	 */
 	public void printFloatArr(float[]arr)
 	{
@@ -262,14 +321,15 @@ public class WeatherModelController {
 		System.out.println();
 	}
 
-	public String getSearchURL() {
-		return searchURL;
-	}
-
 	
 	public static void main(String[] args)
 	{
 		WeatherModelController wmc=new WeatherModelController();
+		DateModel date=wmc.getDateModel();
+		
+		//2014,1,1
+		//2010,3,2
+		date.setDate(2014,1,1);
 		wmc.setLocation("London Heathrow");
 		wmc.getInfo();
 
@@ -297,13 +357,7 @@ public class WeatherModelController {
 
 	}
 
-	public float[] getTime() {
-		return time;
-	}
 
-	public void setTime(float[] time) {
-		this.time = time;
-	}
 
 
 

@@ -14,13 +14,24 @@ public class GraphPanel extends JPanel {
 
 	private int width;
 	private int height;
-	private float bgWidth,bgHeight,bgX,bgY;
+	private float bgWidth,bgHeight,bgX,bgY,xstep;
 	private float ystartNum,ystepNum,yendNum;
 	private int numOfYlines;
 	private static final float BG_SCALE=0.8f;
 	private static final int NUM_OF_XLINES=25;//num of gray lines
 	private DataTransfer dataTransfer;
 	private float[]data;
+	//for special draw points such as gustspeed
+	private float[]dataPoints;
+	public float[] getDataPoints() {
+		return dataPoints;
+	}
+
+	public void setDataPoints(float[] dataPoints) {
+		this.dataPoints = dataPoints;
+	}
+
+
 	private float[]time;
 	private Point2D.Float origin;
 	private String header,leftUnit,rightUnit;
@@ -34,7 +45,7 @@ public class GraphPanel extends JPanel {
 
 	public GraphPanel(int startnum,int endnum,int stepnum,float[]data,float []time)
 	{
-		
+
 		ystartNum=startnum;
 		ystepNum=stepnum;
 		yendNum=endnum;
@@ -45,13 +56,13 @@ public class GraphPanel extends JPanel {
 		leftUnit=null;
 		rightUnit=null;
 		dataTransfer=null;
-	
+		dataPoints=null;
+
 	}
-	
-	//draw table and table metadata
-	private void drawBackGround(Graphics g)
+
+	//calculate background params dynamically
+	private void getBackgroundParams()
 	{
-		//initialize background paras
 		width=this.getWidth();
 		height=this.getHeight();
 		bgWidth=BG_SCALE*width;
@@ -59,42 +70,79 @@ public class GraphPanel extends JPanel {
 		bgX=(width-bgWidth)/2;
 		bgY=(height-bgHeight)/2;
 		origin=new Point2D.Float((width-bgWidth)/2, (height+bgHeight)/2);
-		
-		
-		
+		xstep=bgWidth/(NUM_OF_XLINES-1);
+	}
+
+	private void drawHeaders(Graphics g)
+	{
+		//draw header
 		Graphics2D g2d=(Graphics2D)g;
-		
 		g2d.setStroke(new BasicStroke(1.5f));
 		
 		
-		
-	
-		
-		
-		String yString,xString;
-		float strlenx,strleny;
-		float xstep=bgWidth/(NUM_OF_XLINES-1);
-		Line2D.Double grayline;
-		float x1,y1,x2,y2;
-		
-		//draw header
 		if(header!=null)
-		{	g2d.setColor(Color.red);
-			g2d.drawString(header, (width-bgWidth)/2+xstep, (height-bgHeight)/2-0.8f);
-			g2d.setColor(Color.black);
+		{
+			
+		float startx= (width-bgWidth)/2+xstep;
+		float formerHeaderWidth=0;
+		String[]headers=header.split("&");
+		for (int i = 0; i < headers.length; i++) 
+		{  
+			if(i%2==0)
+			{
+				g2d.setColor(Color.red);
+			}
+			else
+			{
+				g2d.setColor(Color.blue);
+			}
+			if(i>=1)
+			{
+			formerHeaderWidth+=(float)g2d.getFontMetrics().getStringBounds(headers[i-1], g2d).getWidth();
+			}
+			else
+			{
+				formerHeaderWidth=0f;
+			}
+			g2d.drawString(headers[i],startx+formerHeaderWidth, (height-bgHeight)/2-0.8f);
 		}
 		
+		
+		}
+		g2d.setColor(Color.black);
+		g2d.setStroke(new BasicStroke(1.0f));
+	}
+
+	//draw table and table metadata
+	private void drawBackGround(Graphics g)
+	{
+
+		getBackgroundParams();
+
+
+		Graphics2D g2d=(Graphics2D)g;
+
+		g2d.setStroke(new BasicStroke(1.5f));
+
+		String yString,xString;
+		float strlenx,strleny;
+
+		Line2D.Double grayline;
+		float x1,y1,x2,y2;
+
+
+		drawHeaders(g2d);
 		//draw left unit
 		if(leftUnit!=null)
 		{
 			g2d.drawString(leftUnit, (width-bgWidth)/2-2*xstep, (height-bgHeight)/2-0.8f);
-			
+
 		}
 		//draw right unit
 		if(rightUnit!=null)
 		{	
 			g2d.drawString(rightUnit, (width+bgWidth)/2+xstep, (height-bgHeight)/2-0.8f);
-		
+
 		}
 		//draw time lines
 		for(int i=0;i<NUM_OF_XLINES;i++)
@@ -111,7 +159,7 @@ public class GraphPanel extends JPanel {
 			strlenx=(float)g2d.getFontMetrics().getStringBounds(xString, g2d).getWidth();
 			strleny=(float)g2d.getFontMetrics().getStringBounds(xString, g2d).getHeight();
 			g2d.drawString(xString, x1-strlenx/2, y2+strleny);
-			
+
 		}
 		//draw data lines 
 		float ystep=bgHeight/(numOfYlines-1);
@@ -134,23 +182,23 @@ public class GraphPanel extends JPanel {
 			g2d.drawString(yString, x1-strlenx-5, y1+strleny/2);
 			if(dataTransfer!=null)
 			{
-			rightData=dataTransfer.transfer(leftData);
-			yString=Integer.toString((int)rightData);
-			
-			strleny=(float)g2d.getFontMetrics().getStringBounds(yString, g2d).getHeight();
-			g2d.drawString(yString, x2+5, y1+strleny/2);
+				rightData=dataTransfer.transfer(leftData);
+				yString=Integer.toString((int)rightData);
+
+				strleny=(float)g2d.getFontMetrics().getStringBounds(yString, g2d).getHeight();
+				g2d.drawString(yString, x2+5, y1+strleny/2);
 			}
-			
+
 		}
-		
-		
+
+
 		//draw bg rect
 		g2d.setColor(Color.black);
 		Rectangle2D.Double rect=new Rectangle2D.Double(bgX, bgY, bgWidth, bgHeight);
 		g2d.draw(rect);
-		
+
 	}
-	
+
 	public String getLeftUnit() {
 		return leftUnit;
 	}
@@ -175,19 +223,44 @@ public class GraphPanel extends JPanel {
 		this.header = header;
 	}
 
-	private void drawData(Graphics g)
+	private void drawDataLines(Graphics g)
 	{
 		Graphics2D g2d=(Graphics2D)g;
 		g2d.setColor(Color.red);
-		Line2D.Float line;
+		Line2D.Float line=null;
 		for (int i = 0; i < data.length-1; i++) {
-			line=new Line2D.Float(transfer(time[i]/60, data[i]), transfer(time[i+1]/60, data[i+1]));
+			line=new Line2D.Float(transferToPoint2D(time[i]/60, data[i]), transferToPoint2D(time[i+1]/60, data[i+1]));
 			g2d.draw(line);
 		}
 	}
-	private Point2D transfer(float x,float y)
+
+	private void drawDataPoints(Graphics g)
 	{
-		Point2D p= new Point2D.Float();
+		if(dataPoints==null)
+		{
+			return;
+		}
+		Graphics2D g2d=(Graphics2D)g;
+		g2d.setColor(Color.blue);
+		Point2D.Float point=null;
+		Line2D.Float line=null;
+		g2d.setStroke(new BasicStroke(5));
+		for (int i = 0; i < dataPoints.length; i++) {
+			if(dataPoints[i]!=0&&dataPoints[i]>=ystartNum)
+			{
+				point=transferToPoint2D(time[i]/60, dataPoints[i]);
+				line=new Line2D.Float(point,point);
+				g2d.draw(line);
+
+			}
+
+		}
+		g2d.setStroke(new BasicStroke(1));
+
+	}
+	private Point2D.Float transferToPoint2D(float x,float y)
+	{
+		Point2D.Float p= new Point2D.Float();
 		float y1=(float)origin.getY()-(y-ystartNum)/(yendNum-ystartNum)*bgHeight;
 		float x1=x/(NUM_OF_XLINES-1)*bgWidth+(float)origin.getX();
 		p.setLocation(x1, y1);
@@ -201,15 +274,16 @@ public class GraphPanel extends JPanel {
 	{
 		super.paintComponent(g);
 		drawBackGround(g);
-		drawData(g);
-		
-	
+		drawDataLines(g);
+		drawDataPoints(g);
+
+
 	}
-	
-	
+
+
 	public static void main(String[] args) {
-		
-		
+
+
 	}
 
 

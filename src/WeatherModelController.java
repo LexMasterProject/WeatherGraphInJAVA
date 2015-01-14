@@ -1,5 +1,6 @@
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -24,7 +25,7 @@ public class WeatherModelController {
 	    summary+= " "+YYYY+"/"+MM+"/"+DD;
 		summary+= "   "+location;
 		
-		summary+= "    TotalPrecipitationMm:"+totalPrecipitationMm;
+		summary+= "    TotalPrecipitationMm:  "+totalPrecipitationMm;
 	
 		
 		return summary;
@@ -89,8 +90,9 @@ public class WeatherModelController {
 		catch (MalformedURLException e) {
 			e.printStackTrace();
 		}catch (IOException e) {
-			// TODO Auto-generated catch block
+			
 			e.printStackTrace();
+		
 		}
 
 	}
@@ -353,6 +355,7 @@ public class WeatherModelController {
 		
 		//2014,1,1
 		//2010,3,2
+		
 		date.setDate(2014,1,1);
 		wmc.setLocation("London Heathrow");
 		wmc.getInfo();
@@ -379,6 +382,8 @@ public class WeatherModelController {
 		//print summary
 		System.out.println(wmc.getSummary());
 		System.out.println(wmc.getSummary().length());
+	
+		
 
 
 

@@ -34,7 +34,7 @@ public class GraphPanel extends JPanel {
 
 	private float[]time;
 	private Point2D.Float origin;
-	private String header,leftUnit,rightUnit;
+	private String header,leftUnit,rightUnit,footer;
 	public float[] getData() {
 		return data;
 	}
@@ -57,6 +57,7 @@ public class GraphPanel extends JPanel {
 		rightUnit=null;
 		dataTransfer=null;
 		dataPoints=null;
+		footer=null;
 
 	}
 
@@ -113,6 +114,8 @@ public class GraphPanel extends JPanel {
 		g2d.setStroke(new BasicStroke(1.0f));
 	}
 
+	
+
 	//draw table and table metadata
 	private void drawBackGround(Graphics g)
 	{
@@ -132,6 +135,7 @@ public class GraphPanel extends JPanel {
 
 
 		drawHeaders(g2d);
+
 		//draw left unit
 		if(leftUnit!=null)
 		{

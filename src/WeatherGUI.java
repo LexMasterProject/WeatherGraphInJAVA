@@ -152,9 +152,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 				weatherGui.setDefaultCloseOperation(EXIT_ON_CLOSE);
 				weatherGui.pack();
 				weatherGui.setVisible(true);
-				
-				
-				
+								
 			}
 		});
 		

@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridLayout;
@@ -5,7 +6,9 @@ import java.awt.HeadlessException;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
+import javax.swing.BoxLayout;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.text.GapContent;
 
@@ -15,6 +18,7 @@ public class WeatherGraphGui extends JFrame {
 
 	private final String WINDOW_TITLE="WeatherGraph";
 	private GraphPanel tempGraphPanel,windGraphPanel,atPressGraphPanel;
+	private JLabel summaryLabel;
 	private WeatherModelController wmc;
 	
 
@@ -34,6 +38,11 @@ public class WeatherGraphGui extends JFrame {
 		
 		Container c=getContentPane();
 		JPanel p=new JPanel(new GridLayout(3, 1));
+	
+		//add summary label
+		summaryLabel=new JLabel(wmc.getSummary());
+		c.add(summaryLabel,BorderLayout.NORTH);
+	
 		
 		//add temperature panel
 		int temperatureStep=3;
@@ -63,11 +72,8 @@ public class WeatherGraphGui extends JFrame {
 		windGraphPanel.setLeftUnit("km/h");
 		windGraphPanel.setRightUnit("mph");
 		p.add(windGraphPanel);
-		
-		
-
-		
 		c.add(p);
+		
 		
 	}
 	

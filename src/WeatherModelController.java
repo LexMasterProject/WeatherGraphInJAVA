@@ -10,6 +10,30 @@ public class WeatherModelController {
 	private String searchURL;
 	private DateModel dateModel;
 	private String location;
+	private String summary;
+	String YYYY,MM,DD;
+	public String getSummary() {
+		summary=new String();
+		DecimalFormat df=new DecimalFormat("#0.0");
+		String totalPrecipitationMm=df.format(getSum(precipitationMm)).toString();
+		char[]spaceArr=new char[40];
+		Arrays.fill(spaceArr, ' ' );
+		String alias=new String(spaceArr);
+	    summary+=alias;
+	   
+	    summary+= " "+YYYY+"/"+MM+"/"+DD;
+		summary+= "   "+location;
+		
+		summary+= "    TotalPrecipitationMm:"+totalPrecipitationMm;
+	
+		
+		return summary;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
 
 	private WeatherNetSpider spider;
 	
@@ -33,9 +57,9 @@ public class WeatherModelController {
 	private void generateURL()
 	{
 		 String AAAA=AirportSingleton.getInstance().getICAO(location);
-		 String YYYY=Integer.toString(dateModel.getYear());
-		 String MM=Integer.toString(dateModel.getMonth());
-		 String DD=Integer.toString(dateModel.getDay());
+		 YYYY=Integer.toString(dateModel.getYear());
+		 MM=Integer.toString(dateModel.getMonth());
+		 DD=Integer.toString(dateModel.getDay());
 		 searchURL="http://www.wunderground.com/history/airport/"+
 				 	AAAA+"/"+YYYY+"/"+MM+"/"+DD+"/"+
 				 "DailyHistory.html?HideSpecis=1&format=1";
@@ -351,6 +375,10 @@ public class WeatherModelController {
 		//print precipitationMm
 		System.out.println("precipitationMm:");
 		wmc.printFloatArr(wmc.getPrecipitationMm());
+		
+		//print summary
+		System.out.println(wmc.getSummary());
+		System.out.println(wmc.getSummary().length());
 
 
 

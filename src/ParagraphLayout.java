@@ -1,8 +1,3 @@
-/*
- * Copyright (C) Jerry Huxtable 1998-2001. All rights reserved.
- */
-
-
 import java.awt.*;
 
 public class ParagraphLayout extends ConstraintLayout {

@@ -1,44 +1,24 @@
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 
 
+/**
+ * this class is the weather model controller for processing 
+ * all weather data into proper forms to make drawing more neat 
+ * and easy
+ */
 public class WeatherModelController {
-	
+
 	private String searchURL;
-	private DateModel dateModel;
+	private DateMC dateModel;
 	private String location;
 	private String summary;
-	String YYYY,MM,DD;
-	public String getSummary() {
-		summary=new String();
-		DecimalFormat df=new DecimalFormat("#0.0");
-		String totalPrecipitationMm=df.format(getSum(precipitationMm)).toString();
-		char[]spaceArr=new char[40];
-		Arrays.fill(spaceArr, ' ' );
-		String alias=new String(spaceArr);
-	    summary+=alias;
-	   
-	    summary+= " "+YYYY+"/"+MM+"/"+DD;
-		summary+= "   "+location;
-		
-		summary+= "    TotalPrecipitationMm:  "+totalPrecipitationMm;
-	
-		
-		return summary;
-	}
-
-	public void setSummary(String summary) {
-		this.summary = summary;
-	}
-
-
+	private String YYYY,MM,DD;
 	private WeatherNetSpider spider;
-	
-
+	private boolean hasData;
 	private float time[];
 	private float temperature[];
 	private float atPressure[];
@@ -48,28 +28,41 @@ public class WeatherModelController {
 
 	public WeatherModelController()
 	{
-		
-		dateModel=new DateModel();
+
+		dateModel=new DateMC();
 		location=null;
+	
+
+	}
+	private void reset()
+	{
+		hasData=false;
+		time=null;
+		temperature=null;
+		atPressure=null;
+		windSpeed=null;
+		gustSpeed=null;
+		precipitationMm=null;
 	}
 
 	//generate search url
 	//must invoke setLocation in advance
 	private void generateURL()
 	{
-		 String AAAA=AirportSingleton.getInstance().getICAO(location);
-		 YYYY=Integer.toString(dateModel.getYear());
-		 MM=Integer.toString(dateModel.getMonth());
-		 DD=Integer.toString(dateModel.getDay());
-		 searchURL="http://www.wunderground.com/history/airport/"+
-				 	AAAA+"/"+YYYY+"/"+MM+"/"+DD+"/"+
-				 "DailyHistory.html?HideSpecis=1&format=1";
+		String AAAA=AirportSingleton.getInstance().getICAO(location);
+		YYYY=Integer.toString(dateModel.getYear());
+		MM=Integer.toString(dateModel.getMonth());
+		DD=Integer.toString(dateModel.getDay());
+		searchURL="http://www.wunderground.com/history/airport/"+
+				AAAA+"/"+YYYY+"/"+MM+"/"+DD+"/"+
+				"DailyHistory.html?HideSpecis=1&format=1";
 	}
-	
+
 	//get info through spider
 	public void getInfo()
 	{
 		try {
+			reset();
 			generateURL();
 			spider=new WeatherNetSpider(searchURL);
 			if(spider.connect()!=0)
@@ -81,35 +74,62 @@ public class WeatherModelController {
 				windSpeed=arrayListStrToFloatArr(spider.getWindSpeed());
 				gustSpeed=arrayListStrToFloatArr(spider.getGustSpeed());
 				precipitationMm=arrayListStrToFloatArr(spider.getPrecipitationMm());
+				hasData=true;
 			}
 			else
 			{
 				System.out.println("Can not access net");
 			}
-		} 
+		}
+
 		catch (MalformedURLException e) {
 			e.printStackTrace();
 		}catch (IOException e) {
-			
+
 			e.printStackTrace();
-		
+		} catch (NoDataAvailable e) {
+			// TODO Auto-generated catch block
+			hasData=false;
 		}
 
+
 	}
-	
+
+	// get weather summary report
+	public String getSummary() {
+		summary=new String();
+		DecimalFormat df=new DecimalFormat("#0.0");
+		String totalPrecipitationMm=df.format(getSum(precipitationMm)).toString();
+		char[]spaceArr=new char[40];
+		Arrays.fill(spaceArr, ' ' );
+		String alias=new String(spaceArr);
+		summary+=alias;
+		summary+= " "+YYYY+"/"+MM+"/"+DD;
+		summary+= "   "+location;	
+		summary+= "    TotalPrecipitationMm:  "+totalPrecipitationMm;
+
+
+		return summary;
+	}
+
+	/*
+	 *    functions for handling time
+	 */
+
+
 	//transfer timeList to minutes array
 	private float[] transferTimeList(ArrayList<String>timelist)
 	{
-		
+
 		float[]time=new float[timelist.size()];
 		for (int i = 0; i < timelist.size(); i++) {
-			
+
 			time[i]=timeToMinutes(timelist.get(i));
 		}
-		
+
 		return time;
 	}
-	
+
 	//transfer time to minutes
 	//e.g. 03:10 am=3*60+10
 	//     03:10 pm=(3+12)*60+10
@@ -143,8 +163,11 @@ public class WeatherModelController {
 		}
 		return minutes;
 	}
-	
-	
+
+	/*
+	 *  get average and sum of different data
+	 */
+
 	public String getAverageTemperature()
 	{   
 		DecimalFormat df=new DecimalFormat("#0.00");
@@ -169,9 +192,11 @@ public class WeatherModelController {
 		String ret=df.format(getAverage(gustSpeed)).toString();
 		return ret;
 	}
-	
+
 	private float getSum(float[]arr)
 	{
+		if(arr==null)
+			return 0;
 		float sum=0;
 		for (int i = 0; i < arr.length; i++) {
 			sum+=arr[i];
@@ -180,36 +205,14 @@ public class WeatherModelController {
 	}
 	private float getAverage(float[]arr)
 	{
+		if(arr==null)
+			return 0;
 		return getSum(arr)/arr.length;
 	}
-	public void setLocation(String location) {
-		this.location = location;
-	}
 
-	public String getLocation() {
-		return location;
-	}
-
-	public DateModel getDateModel() {
-		return dateModel;
-	}
-
-	public float[] getAtPressure() {
-		return atPressure;
-	}
-
-	public float[] getWindSpeed() {
-		return windSpeed;
-	}
-
-	public float[] getGustSpeed() {
-		return gustSpeed;
-	}
-
-	public float[] getPrecipitationMm() {
-		return precipitationMm;
-	}
-	
+	/*
+	 *  get upper bound and lower bound for different data
+	 */
 	public int getTempStart(int step)
 	{
 		return downRound(temperature, step);
@@ -228,7 +231,7 @@ public class WeatherModelController {
 		int gustWindSpEnd=upRound(gustSpeed, step);
 		return Math.max(normalWindSpEnd, gustWindSpEnd);
 	}
-	
+
 	public int getatPressureStart(int step)
 	{
 		return downRound(atPressure, step);
@@ -237,50 +240,50 @@ public class WeatherModelController {
 	{
 		return upRound(atPressure, step);
 	}
-	
+
 	private int upRound(float[]arr,int step)
 	{
-		
-		 if(arr.length!=0)
-		 {
-			 float max=arr[0];
-			
-			 for(int i=0;i<arr.length;i++)
-			 {
+
+		if(arr.length!=0)
+		{
+			float max=arr[0];
+
+			for(int i=0;i<arr.length;i++)
+			{
 				max=Math.max(max,arr[i]); 
-			 }
-			
-			 int imax=(int)max+1;
-			 while(imax%step!=0)
-			 {
-				 imax++;
-			 }
-			
-			 return imax;
-		 }
-		 return 0;
+			}
+
+			int imax=(int)max+1;
+			while(imax%step!=0)
+			{
+				imax++;
+			}
+
+			return imax;
+		}
+		return 0;
 	}
-	
+
 	private int downRound(float[]arr,int step)
 	{
 		if(arr.length!=0)
-		 {
-			 float min=arr[0];
-			
-			 for(int i=0;i<arr.length;i++)
-			 {
+		{
+			float min=arr[0];
+
+			for(int i=0;i<arr.length;i++)
+			{
 				min=Math.min(min,arr[i]); 
-			 }
-		
-			 int imin=(int)min-1;
-			 while(imin%step!=0)
-			 {
-				 imin--;
-			 }
-	
-			 return imin;
-		 }
-		 return 0;
+			}
+
+			int imin=(int)min-1;
+			while(imin%step!=0)
+			{
+				imin--;
+			}
+
+			return imin;
+		}
+		return 0;
 	}
 
 	//transform from arraylist<String> to float array
@@ -299,11 +302,11 @@ public class WeatherModelController {
 		}
 		return arr;
 	}
-	
 
 
-	
-
+	/*
+	 *  setters & getters
+	 */
 	public String getSearchURL() {
 		return searchURL;
 	}
@@ -315,13 +318,50 @@ public class WeatherModelController {
 	public void setTime(float[] time) {
 		this.time = time;
 	}
-	
+
 	public float[] getTemperature() 
 	{
 		return temperature;
 	}
 
-	
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public String getLocation() {
+		return location;
+	}
+
+	public DateMC getDateModel() {
+		return dateModel;
+	}
+
+	public float[] getAtPressure() {
+		return atPressure;
+	}
+
+	public float[] getWindSpeed() {
+		return windSpeed;
+	}
+
+	public float[] getGustSpeed() {
+		return gustSpeed;
+	}
+
+	public float[] getPrecipitationMm() {
+		return precipitationMm;
+	}
+
+	public void setSummary(String summary) {
+		this.summary = summary;
+	}
+
+	public boolean isHasData() {
+		return hasData;
+	}
+	public void setHasData(boolean hasData) {
+		this.hasData = hasData;
+	}
 	/*
 	 *  output code for testing
 	 */
@@ -347,15 +387,15 @@ public class WeatherModelController {
 		System.out.println();
 	}
 
-	
+
 	public static void main(String[] args)
 	{
 		WeatherModelController wmc=new WeatherModelController();
-		DateModel date=wmc.getDateModel();
-		
+		DateMC date=wmc.getDateModel();
+
 		//2014,1,1
 		//2010,3,2
-		
+
 		date.setDate(2014,1,1);
 		wmc.setLocation("London Heathrow");
 		wmc.getInfo();
@@ -378,12 +418,12 @@ public class WeatherModelController {
 		//print precipitationMm
 		System.out.println("precipitationMm:");
 		wmc.printFloatArr(wmc.getPrecipitationMm());
-		
+
 		//print summary
 		System.out.println(wmc.getSummary());
 		System.out.println(wmc.getSummary().length());
-	
-		
+
+
 
 
 

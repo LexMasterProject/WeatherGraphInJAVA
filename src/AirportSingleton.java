@@ -1,23 +1,27 @@
 import java.util.HashMap;
 
-
+/**
+ * function:
+ * this singleton class is for the storage of all locations and 
+ * transfer from location to ICAO code
+ */
 public class AirportSingleton {
-	
+
 	private static AirportSingleton instance;
-	
+
 	private HashMap<String, String>locationICAO;
 	private static final String strArrLocationICAO[][]={
-			{"London Heathrow","EGLL"},
-			{"Manchester Airport","EGCC"},
-			{"Beijing Capital","ZBAA"},
-			{"Shanghai Pudong","ZSPD"},
-			{"Hong Kong International","VHHH"}
+		{"London Heathrow","EGLL"},
+		{"Manchester Airport","EGCC"},
+		{"Nottingham Airport","EGBN"},
+		{"Leicester Airport","EGBG"},
+		{"Southampton Airport","EGHI"}
 	};
-	
+
 	private AirportSingleton()
 	{
 		locationICAO=new HashMap<String, String>();
-		
+
 		for (int i = 0; i < strArrLocationICAO.length; i++) {
 			locationICAO.put(strArrLocationICAO[i][0], strArrLocationICAO[i][1]);
 		}
@@ -27,7 +31,7 @@ public class AirportSingleton {
 		int size=locationICAO.size();
 		return locationICAO.keySet().toArray(new String[size]);
 	}
-	
+
 	public String getICAO(String location)
 	{
 		return locationICAO.get(location);
@@ -42,7 +46,7 @@ public class AirportSingleton {
 		/*
 		 *  black box testing 
 		 */
-		
+
 		//test getLocations
 		String[]locations=AirportSingleton.getInstance().getLocations();
 		System.out.println("Locations:");
@@ -51,9 +55,9 @@ public class AirportSingleton {
 		}
 		System.out.println();
 		System.out.println("-------------------------------------------");
-		
-		
-		//test getICAO code
+
+
+		//test getICAO code by using location
 		System.out.println("ICAO code:");
 		String ICAOForLondonH=AirportSingleton.getInstance().getICAO("London Heathrow");
 		if (ICAOForLondonH.equals("EGLL")) {
@@ -63,17 +67,17 @@ public class AirportSingleton {
 		{
 			System.out.println("London Heathrow failed");
 		}
-		
-		String ICAOForBeijingC=AirportSingleton.getInstance().getICAO("Beijing Capital");
-		if (ICAOForBeijingC.equals("ZBAA")) {
-			System.out.println("Beijing Capital passed");
+
+		String ICAOForBeijingC=AirportSingleton.getInstance().getICAO("Nottingham Airport");
+		if (ICAOForBeijingC.equals("EGBN")) {
+			System.out.println("Nottingham Airport passed");
 		}
 		else
 		{
-			System.out.println("Beijing Capital failed");
+			System.out.println("Nottingham Airport failed");
 		}
-		
-		
+
+
 
 	}
 

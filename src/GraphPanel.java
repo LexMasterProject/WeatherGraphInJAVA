@@ -9,6 +9,18 @@ import java.awt.geom.Point2D.Float;
 
 import javax.swing.JPanel;
 
+/**
+ *   this class is used to draw graph
+ *   
+ *   usage: 
+ *   first set elements of the graph panel, then the panel will draw the 
+ *   according data.
+ *   
+ *   elements:
+ *   such as datalines & datapoints
+ *   also include headers similar to html but quite simple
+ * 
+ */
 
 public class GraphPanel extends JPanel {
 
@@ -20,28 +32,12 @@ public class GraphPanel extends JPanel {
 	private static final float BG_SCALE=0.8f;
 	private static final int NUM_OF_XLINES=25;//num of gray lines
 	private DataTransfer dataTransfer;
-	private float[]data;
-	//for special draw points such as gustspeed
+	private float[]dataLines;
 	private float[]dataPoints;
-	public float[] getDataPoints() {
-		return dataPoints;
-	}
-
-	public void setDataPoints(float[] dataPoints) {
-		this.dataPoints = dataPoints;
-	}
-
-
 	private float[]time;
 	private Point2D.Float origin;
 	private String header,leftUnit,rightUnit,footer;
-	public float[] getData() {
-		return data;
-	}
 
-	public void setData(float[] data) {
-		this.data = data;
-	}
 
 	public GraphPanel(int startnum,int endnum,int stepnum,float[]data,float []time)
 	{
@@ -49,7 +45,7 @@ public class GraphPanel extends JPanel {
 		ystartNum=startnum;
 		ystepNum=stepnum;
 		yendNum=endnum;
-		this.data=data;
+		this.dataLines=data;
 		numOfYlines=(endnum-startnum)/stepnum+1;
 		this.time=time;
 		header=null;
@@ -61,7 +57,11 @@ public class GraphPanel extends JPanel {
 
 	}
 
+	/*
+	 *  assisting functions for ease of drawing
+	 */
 	//calculate background params dynamically
+	//used for stretching the panel
 	private void getBackgroundParams()
 	{
 		width=this.getWidth();
@@ -74,47 +74,64 @@ public class GraphPanel extends JPanel {
 		xstep=bgWidth/(NUM_OF_XLINES-1);
 	}
 
+	// transfer coordinate system 
+	// make the left point of the tablelike graph as the origin
+	private Point2D.Float transferToPoint2D(float x,float y)
+	{
+		Point2D.Float p= new Point2D.Float();
+		float y1=(float)origin.getY()-(y-ystartNum)/(yendNum-ystartNum)*bgHeight;
+		float x1=x/(NUM_OF_XLINES-1)*bgWidth+(float)origin.getX();
+		p.setLocation(x1, y1);
+		return p;
+	}
+
+
+	/*
+	 *  drawing functions 
+	 */
+
+	//draw headers
 	private void drawHeaders(Graphics g)
 	{
 		//draw header
 		Graphics2D g2d=(Graphics2D)g;
 		g2d.setStroke(new BasicStroke(1.5f));
-		
-		
+
+
 		if(header!=null)
 		{
-			
-		float startx= (width-bgWidth)/2+xstep;
-		float formerHeaderWidth=0;
-		String[]headers=header.split("&");
-		for (int i = 0; i < headers.length; i++) 
-		{  
-			if(i%2==0)
-			{
-				g2d.setColor(Color.red);
+
+			float startx= (width-bgWidth)/2+xstep;
+			float formerHeaderWidth=0;
+			String[]headers=header.split("&");
+			for (int i = 0; i < headers.length; i++) 
+			{  
+				if(i%2==0)
+				{
+					g2d.setColor(Color.red);
+				}
+				else
+				{
+					g2d.setColor(Color.blue);
+				}
+				if(i>=1)
+				{
+					formerHeaderWidth+=(float)g2d.getFontMetrics().getStringBounds(headers[i-1], g2d).getWidth();
+				}
+				else
+				{
+					formerHeaderWidth=0f;
+				}
+				g2d.drawString(headers[i],startx+formerHeaderWidth, (height-bgHeight)/2-0.8f);
 			}
-			else
-			{
-				g2d.setColor(Color.blue);
-			}
-			if(i>=1)
-			{
-			formerHeaderWidth+=(float)g2d.getFontMetrics().getStringBounds(headers[i-1], g2d).getWidth();
-			}
-			else
-			{
-				formerHeaderWidth=0f;
-			}
-			g2d.drawString(headers[i],startx+formerHeaderWidth, (height-bgHeight)/2-0.8f);
-		}
-		
-		
+
+
 		}
 		g2d.setColor(Color.black);
 		g2d.setStroke(new BasicStroke(1.0f));
 	}
 
-	
+
 
 	//draw table and table metadata
 	private void drawBackGround(Graphics g)
@@ -203,41 +220,19 @@ public class GraphPanel extends JPanel {
 
 	}
 
-	public String getLeftUnit() {
-		return leftUnit;
-	}
 
-	public void setLeftUnit(String leftUnit) {
-		this.leftUnit = leftUnit;
-	}
-
-	public String getRightUnit() {
-		return rightUnit;
-	}
-
-	public void setRightUnit(String rightUnit) {
-		this.rightUnit = rightUnit;
-	}
-
-	public String getHeader() {
-		return header;
-	}
-
-	public void setHeader(String header) {
-		this.header = header;
-	}
-
+	//draw datalines such as temperature, atPressure which are continued points
 	private void drawDataLines(Graphics g)
 	{
 		Graphics2D g2d=(Graphics2D)g;
 		g2d.setColor(Color.red);
 		Line2D.Float line=null;
-		for (int i = 0; i < data.length-1; i++) {
-			line=new Line2D.Float(transferToPoint2D(time[i]/60, data[i]), transferToPoint2D(time[i+1]/60, data[i+1]));
+		for (int i = 0; i < dataLines.length-1; i++) {
+			line=new Line2D.Float(transferToPoint2D(time[i]/60, dataLines[i]), transferToPoint2D(time[i+1]/60, dataLines[i+1]));
 			g2d.draw(line);
 		}
 	}
-
+	//draw datapoints such as gustspeed which are sparse points
 	private void drawDataPoints(Graphics g)
 	{
 		if(dataPoints==null)
@@ -262,17 +257,9 @@ public class GraphPanel extends JPanel {
 		g2d.setStroke(new BasicStroke(1));
 
 	}
-	private Point2D.Float transferToPoint2D(float x,float y)
-	{
-		Point2D.Float p= new Point2D.Float();
-		float y1=(float)origin.getY()-(y-ystartNum)/(yendNum-ystartNum)*bgHeight;
-		float x1=x/(NUM_OF_XLINES-1)*bgWidth+(float)origin.getX();
-		p.setLocation(x1, y1);
-		return p;
-	}
-	public void setDataTransfer(DataTransfer dataTransfer) {
-		this.dataTransfer = dataTransfer;
-	}
+
+
+
 
 	public void paintComponent(Graphics g)
 	{
@@ -280,10 +267,52 @@ public class GraphPanel extends JPanel {
 		drawBackGround(g);
 		drawDataLines(g);
 		drawDataPoints(g);
-
-
 	}
 
+	// setters & getters
+	public float[] getDataPoints() {
+		return dataPoints;
+	}
+
+	public void setDataPoints(float[] dataPoints) {
+		this.dataPoints = dataPoints;
+	}
+
+	public float[] getDataLines() {
+		return dataLines;
+	}
+
+	public void setDataLines(float[] data) {
+		this.dataLines = data;
+	}
+
+	public void setDataTransfer(DataTransfer dataTransfer) {
+		this.dataTransfer = dataTransfer;
+	}
+
+	public String getLeftUnit() {
+		return leftUnit;
+	}
+
+	public void setLeftUnit(String leftUnit) {
+		this.leftUnit = leftUnit;
+	}
+
+	public String getRightUnit() {
+		return rightUnit;
+	}
+
+	public void setRightUnit(String rightUnit) {
+		this.rightUnit = rightUnit;
+	}
+
+	public String getHeader() {
+		return header;
+	}
+
+	public void setHeader(String header) {
+		this.header = header;
+	}
 
 	public static void main(String[] args) {
 

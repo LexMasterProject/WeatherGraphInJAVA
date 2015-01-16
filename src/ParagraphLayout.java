@@ -1,5 +1,10 @@
 import java.awt.*;
 
+/**
+ *   customized layout
+ *   this class is from the third party
+ */
+
 public class ParagraphLayout extends ConstraintLayout {
 
 	public final static int TYPE_MASK = 0x03;
@@ -29,7 +34,7 @@ public class ParagraphLayout extends ConstraintLayout {
 	public ParagraphLayout() {
 		this(10, 10, 12, 11, 4, 4);
 	}
-	
+
 	public ParagraphLayout(int hMargin, int vMargin, int hGapMajor, int vGapMajor, int hGapMinor, int vGapMinor) {
 		this.hMargin = hMargin;
 		this.vMargin = vMargin;
@@ -38,7 +43,7 @@ public class ParagraphLayout extends ConstraintLayout {
 		this.hGapMinor = hGapMinor;
 		this.vGapMinor = vGapMinor;
 	}
-	
+
 	public void measureLayout(Container target, Dimension dimension, int type)  {
 		int count = target.getComponentCount();
 		if (count > 0) {
@@ -103,7 +108,7 @@ public class ParagraphLayout extends ConstraintLayout {
 				int rowWidth = 0;
 				Integer paragraphType = NEW_PARAGRAPH;
 				boolean stretchV = false;
-				
+
 				boolean firstLine = true;
 				for (int i = 0; i < count; i++) {
 					Component c = target.getComponent(i);

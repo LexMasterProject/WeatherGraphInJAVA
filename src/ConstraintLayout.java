@@ -1,12 +1,14 @@
 
-
-import java.awt.*;
-import java.util.*;
-
 /**
  * A base class for layouts which simplifies the business of building new
  * layouts with constraints.
+ * 
+ * this code is from the third party 
  */
+import java.awt.*;
+import java.util.*;
+
+
 public class ConstraintLayout implements LayoutManager2 {
 
 	protected final static int PREFERRED = 0;
@@ -15,7 +17,7 @@ public class ConstraintLayout implements LayoutManager2 {
 
 	protected int hMargin = 0;
 	protected int vMargin = 0;
-	private Hashtable constraints;
+	private Hashtable<Component,Object> constraints;
 	protected boolean includeInvisible = false;
 
 	public void addLayoutComponent(String constraint, Component c) {
@@ -34,18 +36,18 @@ public class ConstraintLayout implements LayoutManager2 {
 	public void setConstraint(Component c, Object constraint) {
 		if (constraint != null) {
 			if (constraints == null)
-				constraints = new Hashtable();
+				constraints = new Hashtable<Component, Object>();
 			constraints.put(c, constraint);
 		} else if (constraints != null)
 			constraints.remove(c);
 	}
-	
+
 	public Object getConstraint(Component c) {
 		if (constraints != null)
 			return constraints.get(c);
 		return null;
 	}
-	
+
 	public void setIncludeInvisible(boolean includeInvisible) {
 		this.includeInvisible = includeInvisible;
 	}
@@ -57,19 +59,19 @@ public class ConstraintLayout implements LayoutManager2 {
 	protected boolean includeComponent(Component c) {
 		return includeInvisible || c.isVisible();
 	}
-	
+
 	public Dimension minimumLayoutSize (Container target) {
 		return calcLayoutSize(target, MINIMUM);
 	}
-	
+
 	public Dimension maximumLayoutSize (Container target) {
 		return calcLayoutSize(target, MAXIMUM);
 	}
-	
+
 	public Dimension preferredLayoutSize (Container target) {
 		return calcLayoutSize(target, PREFERRED);
 	}
-	
+
 	public Dimension calcLayoutSize (Container target, int type) {
 		Dimension dim = new Dimension(0, 0);
 		measureLayout(target, dim, type);
@@ -81,7 +83,7 @@ public class ConstraintLayout implements LayoutManager2 {
 
 	public void invalidateLayout(Container target) {
 	}
-	
+
 	public float getLayoutAlignmentX(Container parent) {
 		return 0.5f;
 	}
@@ -93,7 +95,7 @@ public class ConstraintLayout implements LayoutManager2 {
 	public void layoutContainer(Container target)  {
 		measureLayout(target, null, PREFERRED);
 	}
-	
+
 	public void measureLayout(Container target, Dimension dimension, int type)  {
 	}
 

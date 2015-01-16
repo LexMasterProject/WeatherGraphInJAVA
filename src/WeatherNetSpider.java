@@ -8,11 +8,11 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-
+/**
+ * this class is the webspider for grabing the specific weather data 
+ */
 public class WeatherNetSpider {
-	/*
-	 *  Given target url and grab the specific info
-	 */
+
 
 	//the info kind we are interested
 	public static final String[] INFO_KIND={"TimeGMT","TemperatureC","Sea Level PressurehPa","Wind SpeedKm/h","Gust SpeedKm/h","Precipitationmm"};
@@ -22,7 +22,7 @@ public class WeatherNetSpider {
 	private URL url; 
 	private HttpURLConnection httpCon;
 	private int isConnected;
-	
+
 	private String infoHead;
 	private int[]infoIndex;
 	private ArrayList<String>time; 
@@ -36,7 +36,7 @@ public class WeatherNetSpider {
 	public WeatherNetSpider(String urlStr) throws MalformedURLException
 	{
 		url=new URL(urlStr);	
-		
+
 		isConnected=0;
 		infoIndex=new int[NUM_OF_INFO_KIND];
 		time=new ArrayList<String>();
@@ -68,9 +68,9 @@ public class WeatherNetSpider {
 		return isConnected;		
 	}
 
-	public void getInfo() throws IOException
+	public void getInfo() throws NoDataAvailable,IOException
 	{
-		
+
 		if(isConnected==1)
 		{
 			BufferedReader in=new BufferedReader(new InputStreamReader(httpCon.getInputStream()));
@@ -80,24 +80,24 @@ public class WeatherNetSpider {
 				if(inputLine.length()!=0)
 				{
 					infoHead=inputLine;
-					
+
 					getInfoIndex();
 					break;
 				}
-				
+
 			}
-			
+
 			while ((inputLine = in.readLine()) != null) 
 			{
 				parseInfo(inputLine);
-				
+
 			}
 			in.close();
 		}
 
-		
+
 	}
-	
+
 	//get info index through the infoHead
 	private void getInfoIndex()
 	{
@@ -113,58 +113,49 @@ public class WeatherNetSpider {
 			for (int i = 0; i < infoIndex.length; i++) {
 				infoIndex[i]=infoHeaderItems.indexOf(INFO_KIND[i]);
 			}
-			
+
 		}
 	}
-	
-	private void parseInfo(String infoItemStr)
+
+	private void parseInfo(String infoItemStr) throws NoDataAvailable
 	{
 		String[]infoItems;
 		infoItems=infoItemStr.split(",");
 		//if two data appears at the same time:
 		//discard the first, reserve the second
-		if(time.size()==0||!time.get(time.size()-1).equals(infoItems[infoIndex[0]]))
-		{
-		time.add(infoItems[infoIndex[0]]);
-		temperature.add(infoItems[infoIndex[1]]); 
-		atPressure.add(infoItems[infoIndex[2]]); 
-		windSpeed.add(infoItems[infoIndex[3]]);
-		gustSpeed.add(infoItems[infoIndex[4]]);
-		precipitationMm.add(infoItems[infoIndex[5]]);
+		try{
+			if(time.size()==0||!time.get(time.size()-1).equals(infoItems[infoIndex[0]]))
+			{
+				time.add(infoItems[infoIndex[0]]);
+				temperature.add(infoItems[infoIndex[1]]); 
+				atPressure.add(infoItems[infoIndex[2]]); 
+				windSpeed.add(infoItems[infoIndex[3]]);
+				gustSpeed.add(infoItems[infoIndex[4]]);
+				precipitationMm.add(infoItems[infoIndex[5]]);
+			}
+			else
+			{
+				temperature.set(temperature.size()-1, infoItems[infoIndex[1]]);
+				atPressure.set(atPressure.size()-1, infoItems[infoIndex[2]]);
+				windSpeed.set(windSpeed.size()-1, infoItems[infoIndex[3]]);
+				gustSpeed.set(gustSpeed.size()-1, infoItems[infoIndex[4]]);
+				precipitationMm.set(gustSpeed.size()-1, infoItems[infoIndex[5]]);
+
+			}
 		}
-		else
+		catch(IndexOutOfBoundsException ex)
 		{
-			temperature.set(temperature.size()-1, infoItems[infoIndex[1]]);
-			atPressure.set(atPressure.size()-1, infoItems[infoIndex[2]]);
-			windSpeed.set(windSpeed.size()-1, infoItems[infoIndex[3]]);
-			gustSpeed.set(gustSpeed.size()-1, infoItems[infoIndex[4]]);
-			precipitationMm.set(gustSpeed.size()-1, infoItems[infoIndex[5]]);
-		
+			throw new NoDataAvailable();
 		}
 	}
-	
-	public void printTest()
-	{
-		
-		float sum=0;
-		for (String wind : windSpeed) {
-			sum+=Float.parseFloat(wind);
-		}
-		
-		System.out.println("average wind speed:"+sum/windSpeed.size());
-		
-		sum=0;
-		for (String temper : temperature) {
-			sum+=Float.parseFloat(temper);
-		}
-		
-		System.out.println("average tem:"+sum/temperature.size());
-		System.out.println(precipitationMm.get(precipitationMm.size()-1));
-		
-		
-		
-	}
-	
+
+
+
+
+	/*
+	 *  setters & getters
+	 */
+
 	public ArrayList<String> getTime() {
 		return time;
 	}
@@ -192,7 +183,29 @@ public class WeatherNetSpider {
 	public void setUrl(URL url) {
 		this.url = url;
 	}
-	
+
+
+	//output for testing
+	public void printTest()
+	{
+
+		float sum=0;
+		for (String wind : windSpeed) {
+			sum+=Float.parseFloat(wind);
+		}
+
+		System.out.println("average wind speed:"+sum/windSpeed.size());
+
+		sum=0;
+		for (String temper : temperature) {
+			sum+=Float.parseFloat(temper);
+		}
+
+		System.out.println("average tem:"+sum/temperature.size());
+		System.out.println(precipitationMm.get(precipitationMm.size()-1));
+
+	}
+
 	public static void main(String[] args) {
 
 		try {
@@ -202,7 +215,7 @@ public class WeatherNetSpider {
 
 				spider.getInfo();
 				spider.printTest();
-				
+
 			}
 			else
 			{
@@ -215,6 +228,10 @@ public class WeatherNetSpider {
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
+		}
+		catch (NoDataAvailable e) {
+			// TODO: handle exception
+			System.out.println("no data");
 		}
 	}
 

@@ -6,5 +6,5 @@ public class KmhToMph implements DataTransfer {
 		// TODO Auto-generated method stub
 		return a*0.621f;
 	}
-	
+
 }

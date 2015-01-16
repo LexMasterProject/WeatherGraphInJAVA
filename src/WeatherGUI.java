@@ -21,10 +21,12 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-
+/**
+ * this class is the main entry gui
+ */
 
 public class WeatherGUI extends JFrame implements ActionListener {
-	
+
 
 	private final String WINDOW_TITLE="weather";
 	private JButton submitBtn;
@@ -38,43 +40,43 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		Dimension dim = tk.getScreenSize();
 		setSize(dim.width/4, dim.height/4);
 		setLocation(dim.width/4, dim.height/4);
-		
-		
+
+
 		Container c=this.getContentPane();
-		
+
 		//main panel 
 		JPanel p=new JPanel(new ParagraphLayout());
-		
+
 		//airport panel
 		p.add(new JLabel("Airport:"),ParagraphLayout.NEW_PARAGRAPH);
 		airportComboBox=new JComboBox<String>(AirportSingleton.getInstance().getLocations());
 		airportComboBox.setSelectedIndex(0);
 		p.add(airportComboBox);
-	
-		
+
+
 		//date panel 
-	    DateModel date=weatherMC.getDateModel();
-	    p.add(new JLabel("Year:"),ParagraphLayout.NEW_PARAGRAPH);
-	    yearComboBox=addDateComboBox(date.getMinYear(), date.getMaxYear(),date.getYear(), p);
+		DateMC date=weatherMC.getDateModel();
+		p.add(new JLabel("Year:"),ParagraphLayout.NEW_PARAGRAPH);
+		yearComboBox=addDateComboBox(date.getMinYear(), date.getMaxYear(),date.getYear(), p);
 		p.add(new JLabel("Month:"));
 		monthComboBox=addDateComboBox(date.getMinMonth(), date.getMaxMonth(),date.getMonth(), p);
 		p.add(new JLabel("Day:"));
 		dayComboBox=addDateComboBox(date.getMinDay(), date.getMaxDay(), date.getDay(),p);
-	
-		
+
+
 		//submit btn
 		p.add(new Label(),ParagraphLayout.NEW_PARAGRAPH);
 		submitBtn=new JButton("Submit");
 		submitBtn.addActionListener(this);
 		p.add(submitBtn);
-		
+
 
 		c.add(p);
-		
-	}
-	
-  
 
+	}
+
+
+	// factory methods for add dataComboBox
 	private JComboBox<String> addDateComboBox(int min,int max,int item,JPanel p)
 	{
 		String items[]=new String[max-min+1];
@@ -82,7 +84,7 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		{
 			items[i]=Integer.toString(max-i);
 		}
-		
+
 		JComboBox<String> tempComboBox=new JComboBox<String>(items);
 		tempComboBox.setSelectedItem(Integer.toString(item));
 		tempComboBox.addActionListener(this);
@@ -90,74 +92,74 @@ public class WeatherGUI extends JFrame implements ActionListener {
 		tempComboBox.setVisible(true);
 		p.add(tempComboBox);
 		return tempComboBox;
-		
-		
-		
+
+
+
 	}
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		  Object source= e.getSource();
-		  if(source==submitBtn)
-		  {
-			  String location=(String)airportComboBox.getSelectedItem();
-			  weatherMC.setLocation(location);
-			  weatherMC.getInfo();
-			  WeatherGraphGui graphGui=new WeatherGraphGui(weatherMC);
-			  graphGui.setVisible(true);
-			  graphGui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);  
-			  
-			  
-			  // ouput search url
-			  System.out.println(weatherMC.getSearchURL());
-			  
-			 
-		  }
-		  else if(source==yearComboBox)
-		  {
-			  DateModel date=weatherMC.getDateModel();
-			  String year=(String)yearComboBox.getSelectedItem();
-			  date.setYear(Integer.parseInt(year));
-			  dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
-		
-		  }
-		  else if(source==monthComboBox)
-		  {
-			  DateModel date=weatherMC.getDateModel();
-			  String month=(String)monthComboBox.getSelectedItem();
-			  System.out.println(month);
-			  date.setMonth(Integer.parseInt(month));
-			  dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
-		
-		
-		  }
-		  else if(source==dayComboBox)
-		  {
-			  DateModel date=weatherMC.getDateModel();
-			  String day=(String)dayComboBox.getSelectedItem();
-			  date.setDay(Integer.parseInt(day));
-			  dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
-			 
-		  }
-		
-		
+		Object source= e.getSource();
+		if(source==submitBtn)
+		{
+			String location=(String)airportComboBox.getSelectedItem();
+			weatherMC.setLocation(location);
+			weatherMC.getInfo();
+			WeatherGraphGui graphGui=new WeatherGraphGui(weatherMC);
+			graphGui.setVisible(true);
+			graphGui.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);  
+
+
+			// ouput search url
+			System.out.println(weatherMC.getSearchURL());
+
+
+		}
+		else if(source==yearComboBox)
+		{
+			DateMC date=weatherMC.getDateModel();
+			String year=(String)yearComboBox.getSelectedItem();
+			date.setYear(Integer.parseInt(year));
+			dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
+
+		}
+		else if(source==monthComboBox)
+		{
+			DateMC date=weatherMC.getDateModel();
+			String month=(String)monthComboBox.getSelectedItem();
+			System.out.println(month);
+			date.setMonth(Integer.parseInt(month));
+			dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
+
+
+		}
+		else if(source==dayComboBox)
+		{
+			DateMC date=weatherMC.getDateModel();
+			String day=(String)dayComboBox.getSelectedItem();
+			date.setDay(Integer.parseInt(day));
+			dayComboBox.setSelectedItem(Integer.toString(date.getDay()));
+
+		}
+
+
 	}
 	public static void main(String[] args) {
-		
+
 		EventQueue.invokeLater(new Runnable() {
-			
+
 			@Override
 			public void run() {
-			
+
 				WeatherGUI weatherGui=new WeatherGUI();
 				weatherGui.setDefaultCloseOperation(EXIT_ON_CLOSE);
 				weatherGui.pack();
 				weatherGui.setVisible(true);
-								
+
 			}
 		});
-		
+
 	}
 
-	
+
 
 }
